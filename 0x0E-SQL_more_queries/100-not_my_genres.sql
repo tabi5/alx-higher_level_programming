@@ -1,12 +1,16 @@
--- list all genres not linked to the show "Dexter"
--- each record should display `tv_genres.name`
--- results must be sorted in ascending order of genre name
--- maximum 2 SELECT statements allowed
-SELECT `name` FROM `tv_genres`
-WHERE `name` NOT IN (
-	SELECT `name` FROM `tv_shows`
-	INNER JOIN `tv_show_genres` ON `tv_shows`.`id` = `tv_show_genres`.`show_id`
-	INNER JOIN `tv_genres` ON `tv_shows_genre`.`genre_id` = `tv_genres`.`id`
-	WHERE `tv_shows`.`title` = "Dexter"
-)
-ORDER BY `name`;
+-- lists all genres the show dexter is listed under
+CREATE TABLE IF NOT EXISTS dexter_genres
+AS (
+SELECT tv_genres.id, tv_genres.name
+       FROM tv_genres
+       INNER JOIN tv_show_genres
+       ON tv_genres.id = tv_show_genres.genre_id
+       	  INNER JOIN tv_shows
+	  ON tv_shows.id = tv_show_genres.show_id
+	  WHERE tv_shows.title = 'Dexter');
+SELECT tv_genres.name
+       FROM tv_genres
+       LEFT JOIN dexter_genres
+       ON dexter_genres.id = tv_genres.id
+       WHERE dexter_genres.id is NULL
+       ORDER BY tv_genres.name;
